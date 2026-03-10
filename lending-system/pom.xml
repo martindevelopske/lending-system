@@ -20,7 +20,7 @@
     <modules>
         <module>discovery-service</module>
         <module>config-server</module>
-<!--        <module>gateway-service</module>-->
+        <module>gateway</module>
 <!--        <module>product-service</module>-->
 <!--        <module>customer-service</module>-->
 <!--        <module>loan-service</module>-->
