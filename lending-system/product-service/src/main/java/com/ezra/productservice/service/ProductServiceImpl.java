@@ -3,6 +3,7 @@ package com.ezra.productservice.service;
 import com.ezra.productservice.dtos.ProductCreationRequest;
 import com.ezra.productservice.dtos.ProductDto;
 import com.ezra.productservice.dtos.ProductUpdateRequest;
+import com.ezra.productservice.event.ProductEventPublisher;
 import com.ezra.productservice.exception.DuplicateProductException;
 import com.ezra.productservice.exception.ProductNotFoundException;
 import com.ezra.productservice.mapper.ProductMapper;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final ProductEventPublisher productEventPublisher;
 
     @Override
     public ProductDto getProductById(UUID id) {
@@ -48,6 +50,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Created product: {} ({})", product.getName(), product.getId());
 
         //publish product created event
+        productEventPublisher.publishProductCreatedEvent(product);
 
         return productMapper.toDto(product);
     }
@@ -60,6 +63,8 @@ public class ProductServiceImpl implements ProductService {
         log.info("Updated product: {} ({})", product.getName(), product.getId());
 
         //publish product updated event
+        productEventPublisher.publishProductUpdatedEvent(product);
+
         return productMapper.toDto(product);
     }
 
