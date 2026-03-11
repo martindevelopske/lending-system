@@ -2,9 +2,15 @@ package com.ezra.customerservice.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 import java.time.LocalDate;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CustomerCreateRequest {
     @NotBlank(message = "First name is required")
     private String firstName;
