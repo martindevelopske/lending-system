@@ -1,16 +1,15 @@
 package com.ezra.productservice.mapper;
 
+import com.ezra.productservice.dtos.FeeCreationRequest;
 import com.ezra.productservice.dtos.FeeDto;
 import com.ezra.productservice.models.Fee;
+import org.mapstruct.DecoratedWith;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
+@DecoratedWith(FeeMapperDecorator.class)
 public interface FeeMapper {
+    Fee toFeeEntity(FeeCreationRequest request);
 
-    @Mapping(source = "product.id", target = "productId")
-    FeeDto toDto(Fee fee);
-
-    @Mapping(target = "product", ignore = true)
-    Fee toModel(FeeDto feeDto);
+    FeeDto toFeeDto(Fee fee);
 }

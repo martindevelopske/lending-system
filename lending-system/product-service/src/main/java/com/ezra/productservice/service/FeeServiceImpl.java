@@ -4,7 +4,7 @@ import com.ezra.productservice.dtos.FeeCreationRequest;
 import com.ezra.productservice.dtos.FeeDto;
 import com.ezra.productservice.exception.FeeNotFoundException;
 import com.ezra.productservice.exception.ProductNotFoundException;
-import com.ezra.productservice.mapper.ProductMapper;
+import com.ezra.productservice.mapper.FeeMapper;
 import com.ezra.productservice.models.Fee;
 import com.ezra.productservice.models.Product;
 import com.ezra.productservice.repository.FeeRepository;
@@ -20,18 +20,18 @@ import java.util.UUID;
 @Slf4j
 public class FeeServiceImpl implements FeeService {
     private final ProductRepository productRepository;
-    private final ProductMapper productMapper;
+    private final FeeMapper feeMapper;
     private final FeeRepository feeRepository;
 
     @Override
     public FeeDto addFee(UUID productId, FeeCreationRequest request) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product not found: " + productId));
-        Fee fee = productMapper.toFeeEntity(request);
+        Fee fee = feeMapper.toFeeEntity(request);
         product.addFee(fee);
         productRepository.save(product);
 
         log.info("Added fee '{}' to product: ({})", fee.getName(), product.getId());
-        return productMapper.toFeeDto(fee);
+        return feeMapper.toFeeDto(fee);
 
 
     }
@@ -50,7 +50,7 @@ public class FeeServiceImpl implements FeeService {
 
 
         log.info("Updated fee '{}' to product: ({})", fee.getName(), product.getId());
-        return productMapper.toFeeDto(fee);
+        return feeMapper.toFeeDto(fee);
     }
 
     @Override
