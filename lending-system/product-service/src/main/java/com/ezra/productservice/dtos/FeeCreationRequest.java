@@ -1,5 +1,6 @@
 package com.ezra.productservice.dtos;
 import com.ezra.productservice.enums.CalcMethod;
+import com.ezra.productservice.enums.FeeType;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -14,6 +15,8 @@ public class FeeCreationRequest {
     private String name;
 
     private BigDecimal amount;
+
+    private FeeType feeType;
 
     private CalcMethod calculationMethod;
 

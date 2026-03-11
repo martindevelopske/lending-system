@@ -68,12 +68,12 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Fee> fees;
 
-    private void addFee(Fee fee) {
+    public void addFee(Fee fee) {
         fees.add(fee);
         fee.setProduct(this);
     }
 
-    private void removeFee(Fee fee) {
+    public void removeFee(Fee fee) {
         fees.remove(fee);
         fee.setProduct(null);
     }

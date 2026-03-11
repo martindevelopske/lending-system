@@ -1,6 +1,7 @@
 package com.ezra.productservice.models;
 
 import com.ezra.productservice.enums.CalcMethod;
+import com.ezra.productservice.enums.FeeType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +23,9 @@ public class Fee {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
+    private FeeType feeType;
 
     @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal amount;

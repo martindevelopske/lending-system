@@ -1,5 +1,6 @@
 package com.ezra.productservice.dtos;
 
+import com.ezra.productservice.enums.FeeType;
 import lombok.*;
 
 import com.ezra.productservice.enums.CalcMethod;
@@ -18,6 +19,8 @@ public class FeeDto {
     private UUID id;
 
     private String name;
+
+    private FeeType feeType;
 
     private BigDecimal amount;
 
