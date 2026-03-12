@@ -27,6 +27,33 @@ services:
       - customer-data:/var/lib/postgresql/data
     networks:
       - lending-network
+  postgres-loan:
+    image: postgres:16-alpine
+    container_name: postgres-loan
+    environment:
+      POSTGRES_DB: loan_db
+      POSTGRES_USER: lending
+      POSTGRES_PASSWORD: lending
+    ports:
+      - "5435:5432"
+    volumes:
+      - loan-data:/var/lib/postgresql/data
+    networks:
+      - lending-network
+
+  postgres-notification:
+    image: postgres:16-alpine
+    container_name: postgres-notification
+    environment:
+      POSTGRES_DB: notification_db
+      POSTGRES_USER: lending
+      POSTGRES_PASSWORD: lending
+    ports:
+      - "5436:5432"
+    volumes:
+      - notification-data:/var/lib/postgresql/data
+    networks:
+      - lending-network
 
   # --- Messaging ---
   zookeeper:
@@ -78,9 +105,24 @@ services:
     networks:
       - lending-network
 
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: lending
+      RABBITMQ_DEFAULT_PASS: lending
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - lending-network
+
 volumes:
   product-data:
   customer-data:
+  rabbitmq-data:
 
 networks:
   lending-network:
