@@ -22,8 +22,8 @@
         <module>config-server</module>
         <module>gateway</module>
         <module>product-service</module>
-<!--        <module>customer-service</module>-->
-<!--        <module>loan-service</module>-->
+        <module>customer-service</module>
+        <module>loan-service</module>
 <!--        <module>notification-service</module>-->
     </modules>
     <url/>
