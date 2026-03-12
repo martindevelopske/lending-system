@@ -6,4 +6,6 @@ public class LoanEventType {
     public static final String LOAN_CLOSED = "LOAN_CLOSED";
     public static final String LOAN_OVERDUE = "LOAN_OVERDUE";
     public static final String LOAN_CANCELLED = "LOAN_CANCELLED";
+    public static final String LOAN_WRITTEN_OFF = "LOAN_WRITTEN_OFF";
+    public static final String DAILY_FEE_ACCRUED = "DAILY_FEE_ACCRUED";
 }

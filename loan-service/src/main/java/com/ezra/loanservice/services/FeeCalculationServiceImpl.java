@@ -33,4 +33,25 @@ public class FeeCalculationServiceImpl implements FeeCalculationService{
         log.debug("Calculated service fee: {} on principal: {}", totalServiceFee, principalAmount);
         return totalServiceFee;
     }
+
+    @Override
+    public BigDecimal calculateDailyFee(BigDecimal principalAmount, List<Map<String, Object>> fees) {
+        BigDecimal totalDailyFee = BigDecimal.ZERO;
+
+        for (Map<String, Object> fee : fees) {
+            if ("DAILY".equals(fee.get("feeType"))) {
+                BigDecimal feeAmount = new BigDecimal(fee.get("amount").toString());
+                String method = (String) fee.get("calculationMethod");
+
+                if ("PERCENTAGE".equals(method)) {
+                    totalDailyFee = totalDailyFee.add(
+                            principalAmount.multiply(feeAmount).divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP));
+                } else {
+                    totalDailyFee = totalDailyFee.add(feeAmount);
+                }
+            }
+        }
+
+        return totalDailyFee;
+    }
 }

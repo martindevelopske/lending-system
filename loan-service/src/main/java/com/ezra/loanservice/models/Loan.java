@@ -46,6 +46,10 @@ public class Loan {
     @Column(name = "service_fee", precision = 19, scale = 4)
     private BigDecimal serviceFee;
 
+    @Column(name = "accrued_daily_fees", nullable = false, precision = 19, scale = 4)
+    @Builder.Default
+    private BigDecimal accruedDailyFees = BigDecimal.ZERO;
+
     @Column(name = "total_amount", nullable = false, precision = 19, scale = 4)
     private BigDecimal totalAmount;
 
@@ -87,6 +91,9 @@ public class Loan {
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Repayment> repayments = new ArrayList<>();
+
+    @Column(name = "last_fee_accrual_date")
+    private LocalDate lastFeeAccrualDate;
 
     public BigDecimal getOutstandingBalance() {
         return totalAmount.subtract(amountPaid);
