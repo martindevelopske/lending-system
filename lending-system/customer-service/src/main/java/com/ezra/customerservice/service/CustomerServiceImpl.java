@@ -3,6 +3,7 @@ package com.ezra.customerservice.service;
 import com.ezra.customerservice.dto.CustomerCreateRequest;
 import com.ezra.customerservice.dto.CustomerResponse;
 import com.ezra.customerservice.dto.CustomerUpdateRequest;
+import com.ezra.customerservice.event.CustomerEventPublisher;
 import com.ezra.customerservice.exception.CustomerNotFoundException;
 import com.ezra.customerservice.exception.DuplicateCustomerException;
 import com.ezra.customerservice.mapper.CustomerMapper;
@@ -23,6 +24,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final LoanLimitService loanLimitService;
     private final CustomerMapper customerMapper;
+    private final CustomerEventPublisher customerEventPublisher;
 
     @Override
     public CustomerResponse getCustomer(UUID id) {
@@ -47,7 +49,10 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Updated customer: {}", id);
 
         //publish customer updated event
+        customerEventPublisher.publishCustomerUpdatedEvent(customer);
+        log.info("Published customer updated event for customer: {}", id);
 
+        log.info("Updated customer: {} {} ({})", customer.getFirstName(), customer.getLastName(), customer.getId());
         return customerMapper.toResponse(customer);
     }
 
@@ -61,6 +66,10 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Created customer: {} {} ({})", customer.getFirstName(), customer.getLastName(), customer.getId());
 
         //publish customer created event
+        customerEventPublisher.publishCustomerCreatedEvent(customer);
+        log.info("Published customer created event for customer: {}", customer.getId());
+
+        log.info("Created customer: {} {} ({})", customer.getFirstName(), customer.getLastName(), customer.getId());
 
         return customerMapper.toResponse(customer);
     }
