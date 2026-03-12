@@ -1,16 +1,21 @@
 package com.ezra.notificationservice.service;
 
+import com.ezra.notificationservice.channel.NotificationChannel;
 import com.ezra.notificationservice.dto.NotificationLogResponse;
 import com.ezra.notificationservice.dto.NotificationTask;
 import com.ezra.notificationservice.dto.RuleCreateRequest;
 import com.ezra.notificationservice.dto.RuleResponse;
+import com.ezra.notificationservice.enums.ChannelType;
+import com.ezra.notificationservice.enums.NotificationStatus;
 import com.ezra.notificationservice.mapper.NotificationLogMapper;
 import com.ezra.notificationservice.mapper.NotificationRuleMapper;
+import com.ezra.notificationservice.models.NotificationLog;
 import com.ezra.notificationservice.models.NotificationRule;
 import com.ezra.notificationservice.models.NotificationTemplate;
 import com.ezra.notificationservice.repository.NotificationLogRepository;
 import com.ezra.notificationservice.repository.NotificationRuleRepository;
 import com.ezra.notificationservice.repository.NotificationTemplateRepository;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +36,9 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationLogRepository notificationLogRepository;
     private final NotificationRuleMapper notificationRuleMapper;
     private final NotificationLogMapper notificationLogMapper;
+    private final RabbitTemplate rabbitTemplate;
+    private final TemplateRenderer templateRenderer;
+    private final List<NotificationChannel> channels;
 
     @Override
     public void processLoanEvent(String eventType, UUID customerId, UUID loanId, UUID productId, Map<String, String> variables) {
@@ -59,7 +67,7 @@ public class NotificationServiceImpl implements NotificationService {
 
             String routingKey = "notification" + rule.getChannel().name().toLowerCase();
             // todo send with rabbit mq
-//            rabbitTemplate.convertAndSend("notification.exchange", routingKey, task);
+            rabbitTemplate.convertAndSend("notification.exchange", routingKey, task);
 
             log.info("Published notification task: {} for customer: {}", task, customerId);
         }
@@ -95,5 +103,53 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationLogRepository.findByLoanId(loanId).stream()
                 .map(notificationLogMapper::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deliverNotification(NotificationTask task) {
+        String renderedSubject = templateRenderer.render(task.getTemplateSubject(), task.getVariables());
+        String renderedContent = templateRenderer.render(task.getTemplateBody(), task.getVariables());
+
+        ChannelType channelType = ChannelType.valueOf(task.getChannel());
+        NotificationChannel channel = channels.stream()
+                .filter(c -> c.getChannelType() == channelType)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No channel implementation for: " + task.getChannel()));
+
+        String recipient = task.getVariables().getOrDefault("email",
+                task.getVariables().getOrDefault("phoneNumber", "unknown"));
+
+        try {
+            channel.send(recipient, renderedSubject, renderedContent);
+
+            NotificationLog logEntry = NotificationLog.builder()
+                    .customerId(task.getCustomerId())
+                    .loanId(task.getLoanId())
+                    .channel(channelType)
+                    .eventType(task.getEventType())
+                    .subject(renderedSubject)
+                    .content(renderedContent)
+                    .status(NotificationStatus.SENT)
+                    .retryCount(0)
+                    .build();
+            notificationLogRepository.save(logEntry);
+
+        } catch (Exception e) {
+            log.error("Failed to deliver notification: {}", e.getMessage());
+
+            NotificationLog logEntry = NotificationLog.builder()
+                    .customerId(task.getCustomerId())
+                    .loanId(task.getLoanId())
+                    .channel(channelType)
+                    .eventType(task.getEventType())
+                    .subject(renderedSubject)
+                    .content(renderedContent)
+                    .status(NotificationStatus.FAILED)
+                    .retryCount(0)
+                    .errorMessage(e.getMessage())
+                    .build();
+            notificationLogRepository.save(logEntry);
+            throw e;
+        }
     }
 }

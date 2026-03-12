@@ -1,6 +1,7 @@
 package com.ezra.notificationservice.service;
 
 import com.ezra.notificationservice.dto.NotificationLogResponse;
+import com.ezra.notificationservice.dto.NotificationTask;
 import com.ezra.notificationservice.dto.RuleCreateRequest;
 import com.ezra.notificationservice.dto.RuleResponse;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,4 +24,6 @@ public interface NotificationService {
 
     @Transactional(readOnly = true)
     List<NotificationLogResponse> getLoanNotifications(UUID loanId);
+
+    void deliverNotification(NotificationTask task);
 }
