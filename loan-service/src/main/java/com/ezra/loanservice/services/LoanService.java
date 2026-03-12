@@ -13,4 +13,6 @@ public interface LoanService {
     List<LoanResponse> getCustomerLoans(UUID customerId);
 
     LoanResponse disburseLoan(@Valid LoanCreateRequest request);
+
+    List<LoanResponse> getAllLoans();
 }
