@@ -88,4 +88,12 @@ public class Loan {
     @Builder.Default
     private List<Repayment> repayments = new ArrayList<>();
 
+    public BigDecimal getOutstandingBalance() {
+        return totalAmount.subtract(amountPaid);
+    }
+
+    public boolean isFullyPaid() {
+        return amountPaid.compareTo(totalAmount) >= 0;
+    }
+
 }
