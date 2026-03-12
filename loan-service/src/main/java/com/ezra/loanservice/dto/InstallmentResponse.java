@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class IntallmentResponse {
+public class InstallmentResponse {
     private UUID id;
     private Integer installmentNumber;
     private BigDecimal amountDue;

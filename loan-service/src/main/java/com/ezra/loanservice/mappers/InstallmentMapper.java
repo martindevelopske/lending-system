@@ -1,6 +1,6 @@
 package com.ezra.loanservice.mappers;
 
-import com.ezra.loanservice.dto.IntallmentResponse;
+import com.ezra.loanservice.dto.InstallmentResponse;
 import com.ezra.loanservice.models.Installment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class InstallmentMapper {
-    public IntallmentResponse toResponse(Installment installment) {
-        return IntallmentResponse.builder()
+    public InstallmentResponse toResponse(Installment installment) {
+        return InstallmentResponse.builder()
                 .id(installment.getId())
                 .installmentNumber(installment.getInstallmentNumber())
                 .amountDue(installment.getAmountDue())

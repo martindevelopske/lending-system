@@ -33,8 +33,8 @@ public class LoanResponse {
     private String tenureType;
     private LocalDate disbursementDate;
     private LocalDate dueDate;
-//    private List<InstallmentResponse> installments;
-//    private List<RepaymentResponse> repayments;
+    private List<InstallmentResponse> installments;
+    private List<RepaymentResponse> repayments;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
