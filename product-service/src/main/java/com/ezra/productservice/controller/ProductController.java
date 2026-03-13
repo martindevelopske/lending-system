@@ -23,7 +23,7 @@ public class ProductController {
     private final FeeService feeService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDto> getProductById(UUID id) {
+    public ResponseEntity<ProductDto> getProductById(@PathVariable UUID id) {
         return ResponseEntity.ok(productService.getProductById(id));
     }
     @GetMapping()
