@@ -9,10 +9,13 @@ import java.util.regex.Pattern;
 @Component
 public class TemplateRenderer {
 
-    private static final Pattern VARIABLE_PATTERN= Pattern.compile("\\{\\{(\\w+)\\}\\}}");
+    private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{(\\w+)\\}\\}");
 
     public String render(String template, Map<String, String> variables) {
-        if( template == null || variables == null || variables.isEmpty() ) {
+        if (template == null || template.isEmpty()) {
+            return "";
+        }
+        if (variables == null || variables.isEmpty()) {
             return template;
         }
 
