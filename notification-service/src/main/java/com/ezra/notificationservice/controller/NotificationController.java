@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REST controller for notification rule management and notification log retrieval.
+ * Supports creating routing rules that map loan events to channels, and querying
+ * notification history by customer or loan.
+ */
 @RestController
 @RequestMapping("/api/v1/notification")
 @RequiredArgsConstructor

@@ -26,6 +26,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Core notification service that processes loan events into multi-channel notifications.
+ * When a loan event arrives, it looks up active notification rules to determine which
+ * channels (EMAIL, SMS, PUSH) should receive notifications, finds matching templates,
+ * and publishes notification tasks to RabbitMQ for asynchronous delivery.
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -40,6 +46,11 @@ public class NotificationServiceImpl implements NotificationService {
     private final TemplateRenderer templateRenderer;
     private final List<NotificationChannel> channels;
 
+    /**
+     * Processes an incoming loan event by looking up active rules, matching templates,
+     * and publishing notification tasks to RabbitMQ channel-specific queues.
+     * Product-specific templates take priority over global templates.
+     */
     @Override
     public void processLoanEvent(String eventType, UUID customerId, UUID loanId, UUID productId, Map<String, String> variables) {
         log.info("Processing loan event: {}", eventType);
@@ -53,7 +64,8 @@ public class NotificationServiceImpl implements NotificationService {
                 continue;
             }
 
-            NotificationTemplate template = templates.get(0); //firt template is used
+            // Use the first matching template (product-specific templates are sorted first)
+            NotificationTemplate template = templates.get(0);
             NotificationTask task = NotificationTask.builder()
                     .customerId(customerId)
                     .loanId(loanId)
@@ -65,8 +77,8 @@ public class NotificationServiceImpl implements NotificationService {
                     .productId(productId)
                     .build();
 
+            // Route to channel-specific queue (e.g., "notificationemail" → notification.email.queue)
             String routingKey = "notification" + rule.getChannel().name().toLowerCase();
-            // todo send with rabbit mq
             rabbitTemplate.convertAndSend("notification.exchange", routingKey, task);
 
             log.info("Published notification task: {} for customer: {}", task, customerId);
@@ -105,6 +117,11 @@ public class NotificationServiceImpl implements NotificationService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Delivers a notification by rendering the template with variables, selecting the
+     * appropriate channel implementation, and sending. Logs the result (SENT or FAILED)
+     * to the notification_logs table. Failed deliveries are re-thrown for DLQ handling.
+     */
     @Override
     public void deliverNotification(NotificationTask task) {
         String renderedSubject = templateRenderer.render(task.getTemplateSubject(), task.getVariables());

@@ -6,11 +6,17 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Renders notification templates by substituting Mustache-style {@code {{variable}}}
+ * placeholders with values from a provided variable map. Unresolved placeholders
+ * are left as-is in the output.
+ */
 @Component
 public class TemplateRenderer {
 
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{(\\w+)\\}\\}");
 
+    /** Replaces all {@code {{key}}} placeholders in the template with corresponding variable values. */
     public String render(String template, Map<String, String> variables) {
         if (template == null || template.isEmpty()) {
             return "";

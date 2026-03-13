@@ -19,6 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+/**
+ * Service managing customer loan limits. Each customer has a maximum borrowing limit
+ * and an available amount that decreases when loans are disbursed and increases
+ * when loans are repaid. Used by the loan-service to validate eligibility.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -68,6 +73,7 @@ public class LoanLimitServiceImpl implements LoanLimitService {
                 .build();
     }
 
+    /** Decreases available limit when a loan is disbursed. Throws if insufficient balance. */
     @Transactional
     public void decreaseAvailableAmount(UUID customerId, BigDecimal amount) {
         LoanLimit loanLimit = loanLimitRepository.findByCustomerId(customerId)
@@ -82,6 +88,7 @@ public class LoanLimitServiceImpl implements LoanLimitService {
         log.info("Decreased available amount for customer {} by {}", customerId, amount);
     }
 
+    /** Restores available limit when a loan is repaid. Caps at maxLoanAmount. */
     @Transactional
     public void increaseAvailableAmount(UUID customerId, BigDecimal amount) {
         LoanLimit loanLimit = loanLimitRepository.findByCustomerId(customerId).orElse(null);

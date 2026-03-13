@@ -10,6 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Kafka consumer that listens for loan lifecycle events (disbursed, repayment, overdue, etc.)
+ * from the loan-service and triggers notification processing. Extracts event data into
+ * template variables for rendering (loanId, amount, customer contact info, etc.).
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j

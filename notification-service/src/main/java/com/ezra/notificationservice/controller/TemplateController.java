@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REST controller for managing notification templates. Templates define the
+ * subject and body content (with {@code {{variable}}} placeholders) used to
+ * render notifications for specific event types and channels.
+ */
 @RestController
 @RequestMapping("/api/templates")
 @RequiredArgsConstructor

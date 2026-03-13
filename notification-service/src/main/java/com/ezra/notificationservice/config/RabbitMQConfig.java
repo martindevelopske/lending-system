@@ -6,9 +6,19 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * RabbitMQ messaging configuration for multi-channel notification delivery.
+ *
+ * <p>Architecture:
+ * <ul>
+ *   <li>Main exchange routes notifications to channel-specific queues (email, sms, push)</li>
+ *   <li>Failed messages are routed to a retry queue with 5-minute TTL</li>
+ *   <li>After retry TTL expires, messages go to a permanent failed queue</li>
+ * </ul>
+ */
 @Configuration
 public class RabbitMQConfig {
-    //main exchange
+    // Main exchange for routing notifications to channel-specific queues
     @Bean
     public TopicExchange notificationExchange() {
         return new TopicExchange("notification.exchange");
