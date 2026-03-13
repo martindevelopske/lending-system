@@ -1,7 +1,6 @@
 package com.ezra.loanservice.controller;
 
-import com.ezra.loanservice.dto.LoanCreateRequest;
-import com.ezra.loanservice.dto.LoanResponse;
+import com.ezra.loanservice.dto.*;
 import com.ezra.loanservice.services.BillingService;
 import com.ezra.loanservice.services.LoanService;
 import com.ezra.loanservice.services.RepaymentService;
@@ -42,14 +41,14 @@ public class LoanController {
         return ResponseEntity.ok(loanService.getCustomerLoans(customerId));
     }
 
-//    @PostMapping("/{loanId}/repayments")
-//    public ResponseEntity<RepaymentResponse> makeRepayment(@PathVariable UUID loanId,
-//                                                           @Valid @RequestBody RepaymentRequest request) {
-//        return ResponseEntity.status(HttpStatus.CREATED).body(repaymentService.makeRepayment(loanId, request));
-//    }
-//
-//    @GetMapping("/customer/{customerId}/summary")
-//    public ResponseEntity<LoanSummaryResponse> getCustomerSummary(@PathVariable UUID customerId) {
-//        return ResponseEntity.ok(billingService.getCustomerSummary(customerId));
-//    }
+    @PostMapping("/{loanId}/repayments")
+    public ResponseEntity<RepaymentResponse> makeRepayment(@PathVariable UUID loanId,
+                                                           @Valid @RequestBody RepaymentRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(repaymentService.makeRepayment(loanId, request));
+    }
+
+    @GetMapping("/customer/{customerId}/summary")
+    public ResponseEntity<LoanSummaryResponse> getCustomerSummary(@PathVariable UUID customerId) {
+        return ResponseEntity.ok(billingService.getCustomerSummary(customerId));
+    }
 }
