@@ -29,13 +29,13 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue smsQueue() {
-        return QueueBuilder.durable("notification.email.queue").withArgument("x-dead-letter-exchange", "notification.dlx")
+        return QueueBuilder.durable("notification.sms.queue").withArgument("x-dead-letter-exchange", "notification.dlx")
                 .withArgument("x-dead-letter-routing-key", "notification.retry").build();
     }
 
     @Bean
     public Queue pushQueue() {
-        return QueueBuilder.durable("notification.email.queue").withArgument("x-dead-letter-exchange", "notification.dlx")
+        return QueueBuilder.durable("notification.push.queue").withArgument("x-dead-letter-exchange", "notification.dlx")
                 .withArgument("x-dead-letter-routing-key", "notification.retry").build();
     }
 

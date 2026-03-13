@@ -4,11 +4,15 @@ import com.ezra.productservice.dtos.FeeCreationRequest;
 import com.ezra.productservice.dtos.FeeDto;
 import com.ezra.productservice.models.Fee;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 @Component
+@Primary
 public class FeeMapperDecorator implements FeeMapper {
     @Autowired
+    @Qualifier("feeMapperImpl")
     private FeeMapper delegate;
 
     @Override

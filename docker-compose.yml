@@ -119,10 +119,209 @@ services:
     networks:
       - lending-network
 
+  # --- Observability ---
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - lending-network
+
+  # --- Infrastructure Services ---
+  config-server:
+    build:
+      context: .
+      dockerfile: config-server/Dockerfile
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    networks:
+      - lending-network
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:8888/actuator/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  discovery-service:
+    build:
+      context: .
+      dockerfile: discovery-service/Dockerfile
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    environment:
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    networks:
+      - lending-network
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:8761/actuator/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  gateway-service:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    networks:
+      - lending-network
+
+  # --- Business Services ---
+  product-service:
+    build:
+      context: .
+      dockerfile: product-service/Dockerfile
+    container_name: product-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres-product:
+        condition: service_started
+      kafka:
+        condition: service_started
+      kafka-init:
+        condition: service_started
+      discovery-service:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-product:5432/product_db
+      SPRING_DATASOURCE_USERNAME: lending
+      SPRING_DATASOURCE_PASSWORD: lending
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    networks:
+      - lending-network
+
+  customer-service:
+    build:
+      context: .
+      dockerfile: customer-service/Dockerfile
+    container_name: customer-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres-customer:
+        condition: service_started
+      kafka:
+        condition: service_started
+      kafka-init:
+        condition: service_started
+      discovery-service:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-customer:5432/customer_db
+      SPRING_DATASOURCE_USERNAME: lending
+      SPRING_DATASOURCE_PASSWORD: lending
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    networks:
+      - lending-network
+
+  loan-service:
+    build:
+      context: .
+      dockerfile: loan-service/Dockerfile
+    container_name: loan-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres-loan:
+        condition: service_started
+      kafka:
+        condition: service_started
+      kafka-init:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      discovery-service:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-loan:5432/loan_db
+      SPRING_DATASOURCE_USERNAME: lending
+      SPRING_DATASOURCE_PASSWORD: lending
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: lending
+      SPRING_RABBITMQ_PASSWORD: lending
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    networks:
+      - lending-network
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    container_name: notification-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      postgres-notification:
+        condition: service_started
+      kafka:
+        condition: service_started
+      kafka-init:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      discovery-service:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-notification:5432/notification_db
+      SPRING_DATASOURCE_USERNAME: lending
+      SPRING_DATASOURCE_PASSWORD: lending
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: lending
+      SPRING_RABBITMQ_PASSWORD: lending
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    networks:
+      - lending-network
 volumes:
   product-data:
   customer-data:
   rabbitmq-data:
+  loan-data:
+  notification-data:
 
 networks:
   lending-network:

@@ -1,12 +1,10 @@
 package com.ezra.productservice.mapper;
 import com.ezra.productservice.dtos.*;
 import com.ezra.productservice.models.Product;
-import org.mapstruct.DecoratedWith;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel="spring")
-@DecoratedWith(ProductMapperDecorator.class)
 public interface ProductMapper {
     ProductDto toDto(Product product);
     Product toModel(ProductDto productDto);

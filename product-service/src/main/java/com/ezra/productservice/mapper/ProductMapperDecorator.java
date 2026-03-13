@@ -4,11 +4,15 @@ import com.ezra.productservice.dtos.*;
 import com.ezra.productservice.models.Fee;
 import com.ezra.productservice.models.Product;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 @Component
+@Primary
 public class ProductMapperDecorator implements ProductMapper {
     @Autowired
+    @Qualifier("productMapperImpl")
     private ProductMapper delegate;
 
     @Override

@@ -6,11 +6,15 @@ import com.ezra.customerservice.dto.CustomerUpdateRequest;
 import com.ezra.customerservice.enums.CustomerStatus;
 import com.ezra.customerservice.models.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 @Component
+@Primary
 public class CustomerMapperDecorator implements CustomerMapper {
     @Autowired
+    @Qualifier("customerMapperImpl")
     private CustomerMapper delegate;
 
     @Autowired
