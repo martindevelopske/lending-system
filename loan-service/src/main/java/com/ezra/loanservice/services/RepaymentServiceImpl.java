@@ -22,6 +22,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Handles loan repayment processing including payment recording, installment allocation,
+ * and automatic loan closure when fully paid. Publishes LOAN_REPAYMENT or LOAN_CLOSED
+ * events to Kafka for downstream notification processing.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -31,17 +36,30 @@ public class RepaymentServiceImpl implements RepaymentService {
     private final LoanStateMachine loanStateMachine;
     private final LoanEventPublisher loanEventPublisher;
 
+    /**
+     * Records a repayment against a loan. Caps overpayments at the outstanding balance,
+     * allocates the payment across unpaid installments in order, and transitions the
+     * loan to CLOSED if fully paid.
+     *
+     * @param loanId  the loan to apply payment to
+     * @param request contains amount, payment method, and reference
+     * @return details of the recorded repayment
+     * @throws LoanNotFoundException           if the loan does not exist
+     * @throws InvalidStateTransitionException if the loan is in a terminal state (CLOSED, CANCELLED, WRITTEN_OFF)
+     */
     @Override
     @Transactional
     public RepaymentResponse makeRepayment(UUID loanId, RepaymentRequest request) {
         Loan loan = loanRepository.findByIdWithDetails(loanId)
                 .orElseThrow(() -> new LoanNotFoundException("Loan not found: " + loanId));
 
+        // Reject payments on loans that are already closed, cancelled, or written off
         if (loanStateMachine.isTerminalState(loan.getState())) {
             throw new InvalidStateTransitionException(
                     "Cannot make repayment on loan in " + loan.getState() + " state");
         }
 
+        // Cap the payment at the outstanding balance to prevent overpayment
         BigDecimal paymentAmount = request.getAmount();
         BigDecimal outstanding = loan.getOutstandingBalance();
 
@@ -90,6 +108,11 @@ public class RepaymentServiceImpl implements RepaymentService {
                 .build();
     }
 
+    /**
+     * Distributes a payment across unpaid installments in sequential order.
+     * Each installment is fully paid before moving to the next. Partial payments
+     * on an installment mark it as PARTIALLY_PAID.
+     */
     private void allocateToInstallments(List<Installment> installments, BigDecimal payment) {
         BigDecimal remaining = payment;
 

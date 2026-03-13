@@ -26,6 +26,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Core loan management service handling disbursement, retrieval, and lifecycle operations.
+ * Coordinates with product-service and customer-service via Feign clients to validate
+ * eligibility and calculate fees before loan creation.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -38,9 +43,18 @@ public class LoanServiceImpl implements LoanService {
     private final FeeCalculationService feeCalculationService;
     private final LoanEventPublisher loanEventPublisher;
 
+    /**
+     * Disburses a new loan by validating the product configuration and customer eligibility,
+     * calculating service fees, creating the loan entity, and generating installments
+     * if the product uses an installment structure. Publishes a LOAN_DISBURSED event to Kafka.
+     *
+     * @param request contains customerId, productId, and requested loan amount
+     * @return the created loan with installments and computed totals
+     * @throws InsufficientLoanLimitException if customer's available limit is below the requested amount
+     */
     @Override
     public LoanResponse disburseLoan(LoanCreateRequest request) {
-        //check product details
+        // Fetch product configuration (structure, tenure, interest rate, fees)
         Map<String, Object> product = productClient.getProduct(request.getProductId());
         String productName = (String) product.get("name");
         String loanStructureStr = (String) product.get("loanStructure");
@@ -124,6 +138,7 @@ public class LoanServiceImpl implements LoanService {
                 .collect(Collectors.toList());
     }
 
+    /** Calculates the loan maturity date based on the tenure type and value. */
     private LocalDate calculateDueDate(LocalDate disbursementDate, int installmentNumber, String tenureType) {
         return switch (tenureType) {
             case "DAYS" -> disbursementDate.plusDays(installmentNumber);

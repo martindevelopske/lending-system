@@ -15,6 +15,11 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Scheduled job that marks OPEN loans as OVERDUE when their due date has passed.
+ * Runs daily at 1 AM. Transitions each overdue loan via the state machine
+ * and publishes LOAN_OVERDUE events to Kafka for notification processing.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j

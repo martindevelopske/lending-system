@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REST controller for loan lifecycle operations including disbursement,
+ * repayments, and consolidated billing summaries.
+ */
 @RestController
 @RequestMapping("/api/v1/loans")
 @RequiredArgsConstructor

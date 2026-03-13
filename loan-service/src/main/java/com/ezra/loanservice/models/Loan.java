@@ -15,6 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Core entity representing a loan in the system. Tracks the full lifecycle from
+ * disbursement through repayment to closure or write-off.
+ * Total amount = principal + service fee. Outstanding balance = total - amount paid.
+ * Supports both LUMP_SUM (single payment) and INSTALLMENT (multiple payments) structures.
+ */
 @Entity
 @Table(name = "loans")
 @EntityListeners(AuditingEntityListener.class)
@@ -95,10 +101,12 @@ public class Loan {
     @Column(name = "last_fee_accrual_date")
     private LocalDate lastFeeAccrualDate;
 
+    /** Returns the remaining amount owed (totalAmount - amountPaid). */
     public BigDecimal getOutstandingBalance() {
         return totalAmount.subtract(amountPaid);
     }
 
+    /** Returns true if the loan has been fully repaid. */
     public boolean isFullyPaid() {
         return amountPaid.compareTo(totalAmount) >= 0;
     }

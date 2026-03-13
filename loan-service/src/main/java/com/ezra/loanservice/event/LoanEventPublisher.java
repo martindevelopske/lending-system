@@ -6,6 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * Publishes loan lifecycle events to the Kafka "loan.events" topic.
+ * Events are keyed by customerId to ensure all events for a customer
+ * are routed to the same partition for ordered processing.
+ * Consumed by the notification-service for multi-channel notifications.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j

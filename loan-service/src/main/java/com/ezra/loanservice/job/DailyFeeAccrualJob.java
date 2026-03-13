@@ -18,6 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Scheduled job that accrues daily fees on all active (OPEN/OVERDUE) loans.
+ * Runs daily at 12:30 AM. For each loan, fetches the product's fee configuration
+ * and calculates the daily fee based on the current outstanding balance.
+ * Tracks last accrual date per loan to prevent duplicate accruals.
+ * Errors on individual loans are caught and logged without stopping the batch.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j

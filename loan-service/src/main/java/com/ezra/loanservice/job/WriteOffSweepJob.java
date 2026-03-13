@@ -16,6 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Scheduled job that automatically writes off loans that have been overdue
+ * beyond a configurable threshold (default: 90 days). Runs daily at 3 AM.
+ * Transitions loans from OVERDUE to WRITTEN_OFF via the state machine
+ * and publishes LOAN_WRITTEN_OFF events to Kafka for notifications.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
