@@ -13,6 +13,11 @@ import org.springframework.web.context.annotation.RequestScope;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REST controller for customer management and loan limit operations.
+ * Provides endpoints for customer CRUD, loan limit configuration,
+ * and eligibility checks used by the loan-service during disbursement.
+ */
 @RestController
 @RequestMapping("/api/v1/customers")
 @RequiredArgsConstructor

@@ -16,6 +16,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Service managing customer registration and profile updates.
+ * Enforces uniqueness on email, phone number, and national ID.
+ * Publishes customer lifecycle events to Kafka for downstream services.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -74,6 +79,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toResponse(customer);
     }
 
+    /** Validates that email, phone number, and national ID are not already registered. */
     private void validateUniqueness(CustomerCreateRequest request) {
         if (customerRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateCustomerException("Customer with email '" + request.getEmail() + "' already exists");
