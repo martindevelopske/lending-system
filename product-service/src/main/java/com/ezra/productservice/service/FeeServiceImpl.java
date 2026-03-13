@@ -15,6 +15,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Service managing fee configurations for lending products.
+ * Each product can have multiple fees of different types (SERVICE, DAILY, LATE)
+ * with either FIXED or PERCENTAGE calculation methods.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

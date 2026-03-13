@@ -18,6 +18,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Service managing lending product lifecycle including creation, retrieval, updates, and deletion.
+ * Validates product name uniqueness and publishes Kafka events on product changes.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

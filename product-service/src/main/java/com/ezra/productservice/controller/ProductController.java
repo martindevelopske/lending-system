@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REST controller for managing lending products and their fee configurations.
+ * Products define the terms for loans including tenure, interest rate, loan structure,
+ * and associated fees (service, daily, late).
+ */
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
