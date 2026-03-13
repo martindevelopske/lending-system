@@ -11,16 +11,16 @@ public class GatewayRoutesConfig {
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("product-service", r -> r
-                        .path("/api/products/**")
+                        .path("/api/v1/products/**")
                         .uri("lb://product-service"))
                 .route("customer-service", r -> r
-                        .path("/api/customers/**")
+                        .path("/api/v1/customers/**")
                         .uri("lb://customer-service"))
                 .route("loan-service", r -> r
-                        .path("/api/loans/**")
+                        .path("/api/v1/loans/**")
                         .uri("lb://loan-service"))
                 .route("notification-service", r -> r
-                        .path("/api/notifications/**", "/api/templates/**")
+                        .path("/api/v1/notification/**", "/api/templates/**")
                         .uri("lb://notification-service"))
                 .build();
     }
