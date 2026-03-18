@@ -20,7 +20,7 @@ public class GatewayRoutesConfig {
                         .path("/api/v1/loans/**")
                         .uri("lb://loan-service"))
                 .route("notification-service", r -> r
-                        .path("/api/v1/notification/**", "/api/templates/**")
+                        .path("/api/v1/notification/**", "/api/v1/templates/**")
                         .uri("lb://notification-service"))
                 .build();
     }

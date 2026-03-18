@@ -60,7 +60,7 @@ class TemplateControllerTest {
         TemplateResponse response = sampleTemplate();
         when(templateService.createTemplate(any(TemplateCreateRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/templates")
+        mockMvc.perform(post("/api/v1/templates")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -77,7 +77,7 @@ class TemplateControllerTest {
                 .bodyTemplate("Body")
                 .build();
 
-        mockMvc.perform(post("/api/templates")
+        mockMvc.perform(post("/api/v1/templates")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -92,7 +92,7 @@ class TemplateControllerTest {
                 .bodyTemplate("Body")
                 .build();
 
-        mockMvc.perform(post("/api/templates")
+        mockMvc.perform(post("/api/v1/templates")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -106,7 +106,7 @@ class TemplateControllerTest {
                 .subject("Subject")
                 .build();
 
-        mockMvc.perform(post("/api/templates")
+        mockMvc.perform(post("/api/v1/templates")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -119,7 +119,7 @@ class TemplateControllerTest {
         List<TemplateResponse> templates = List.of(sampleTemplate(), sampleTemplate());
         when(templateService.getAllTemplates()).thenReturn(templates);
 
-        mockMvc.perform(get("/api/templates"))
+        mockMvc.perform(get("/api/v1/templates"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
     }
@@ -128,7 +128,7 @@ class TemplateControllerTest {
     void getAllTemplates_emptyList_returnsOk() throws Exception {
         when(templateService.getAllTemplates()).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/templates"))
+        mockMvc.perform(get("/api/v1/templates"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
@@ -142,7 +142,7 @@ class TemplateControllerTest {
         response.setId(id);
         when(templateService.getTemplate(id)).thenReturn(response);
 
-        mockMvc.perform(get("/api/templates/{id}", id))
+        mockMvc.perform(get("/api/v1/templates/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.eventType").value("LOAN_DISBURSED"));
@@ -155,7 +155,7 @@ class TemplateControllerTest {
         UUID id = UUID.randomUUID();
         doNothing().when(templateService).deleteTemplate(id);
 
-        mockMvc.perform(delete("/api/templates/{id}", id))
+        mockMvc.perform(delete("/api/v1/templates/{id}", id))
                 .andExpect(status().isNoContent());
 
         verify(templateService).deleteTemplate(id);

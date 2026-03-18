@@ -62,7 +62,7 @@ The system follows an event-driven microservices architecture with centralized c
 - CRUD operations for lending products
 - Fee configuration per product (SERVICE, DAILY, LATE fee types)
 - Supports FIXED and PERCENTAGE calculation methods
-- Loan structures: LUMP_SUM and INSTALLMENT
+- Loan structures: LUMPSUM and INSTALLMENT
 - Configurable tenure (DAYS, WEEKS, MONTHS)
 - Publishes product events to Kafka
 
@@ -127,17 +127,17 @@ The system follows an event-driven microservices architecture with centralized c
 | POST | `/{loanId}/repayments` | Make repayment |
 | GET | `/customer/{customerId}/summary` | Get billing summary |
 
-### Notification Service (`/api/v1/notification`)
+### Notification Service
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/rules` | Create notification rule |
-| GET | `/rules` | List all rules |
-| GET | `/customer/{customerId}` | Get customer notifications |
-| GET | `/loan/{loanId}` | Get loan notifications |
-| POST | `/api/templates` | Create template |
-| GET | `/api/templates` | List all templates |
-| GET | `/api/templates/{id}` | Get template |
-| DELETE | `/api/templates/{id}` | Delete template |
+| POST | `/api/v1/notification/rules` | Create notification rule |
+| GET | `/api/v1/notification/rules` | List all rules |
+| GET | `/api/v1/notification/customer/{customerId}` | Get customer notifications |
+| GET | `/api/v1/notification/loan/{loanId}` | Get loan notifications |
+| POST | `/api/v1/templates` | Create template |
+| GET | `/api/v1/templates` | List all templates |
+| GET | `/api/v1/templates/{id}` | Get template |
+| DELETE | `/api/v1/templates/{id}` | Delete template |
 
 ## Getting Started
 
@@ -167,7 +167,7 @@ docker compose ps
    - Customer: http://localhost:8082/swagger-ui.html
    - Loan: http://localhost:8083/swagger-ui.html
    - Notification: http://localhost:8084/swagger-ui.html
-3. **RabbitMQ Management:** http://localhost:15672 (guest/guest)
+3. **RabbitMQ Management:** http://localhost:15672 (lending/lending)
 4. **Zipkin:** http://localhost:9411
 
 ### Sample API Calls (via Gateway)

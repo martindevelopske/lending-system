@@ -19,7 +19,7 @@ import java.util.UUID;
  * render notifications for specific event types and channels.
  */
 @RestController
-@RequestMapping("/api/templates")
+@RequestMapping("/api/v1/templates")
 @RequiredArgsConstructor
 public class TemplateController {
 
