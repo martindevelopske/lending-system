@@ -66,8 +66,8 @@ class RepaymentServiceImplTest {
                 .interestRate(new BigDecimal("0.05"))
                 .disbursementDate(LocalDate.now())
                 .dueDate(LocalDate.now().plusDays(30))
-                .installments(new ArrayList<>())
-                .repayments(new ArrayList<>())
+                .installments(new java.util.HashSet<>())
+                .repayments(new java.util.HashSet<>())
                 .build();
     }
 
@@ -183,7 +183,7 @@ class RepaymentServiceImplTest {
                 .loan(loan)
                 .build();
 
-        loan.setInstallments(new ArrayList<>(java.util.List.of(inst1, inst2, inst3)));
+        loan.setInstallments(new java.util.HashSet<>(java.util.List.of(inst1, inst2, inst3)));
 
         when(loanRepository.findByIdWithDetails(loanId)).thenReturn(Optional.of(loan));
         when(loanStateMachine.isTerminalState(LoanState.OPEN)).thenReturn(false);

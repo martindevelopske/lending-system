@@ -12,7 +12,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -92,14 +94,25 @@ public class Loan {
 
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Installment> installments = new ArrayList<>();
+    private Set<Installment> installments = new HashSet<>();
 
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Repayment> repayments = new ArrayList<>();
+    private Set<Repayment> repayments = new HashSet<>();
 
     @Column(name = "last_fee_accrual_date")
     private LocalDate lastFeeAccrualDate;
+
+    @jakarta.persistence.PrePersist
+    protected void onCreate() {
+        if (createdAt == null) createdAt = LocalDateTime.now();
+        if (updatedAt == null) updatedAt = LocalDateTime.now();
+    }
+
+    @jakarta.persistence.PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
     /** Returns the remaining amount owed (totalAmount - amountPaid). */
     public BigDecimal getOutstandingBalance() {

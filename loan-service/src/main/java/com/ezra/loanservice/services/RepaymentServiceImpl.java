@@ -79,7 +79,7 @@ public class RepaymentServiceImpl implements RepaymentService {
 
         // Allocate payment to installments if applicable
         if (!loan.getInstallments().isEmpty()) {
-            allocateToInstallments(loan.getInstallments(), paymentAmount);
+            allocateToInstallments(new java.util.ArrayList<>(loan.getInstallments()), paymentAmount);
         }
 
         // Close loan if fully paid

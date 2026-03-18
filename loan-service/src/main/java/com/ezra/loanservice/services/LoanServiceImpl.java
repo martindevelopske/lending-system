@@ -60,7 +60,7 @@ public class LoanServiceImpl implements LoanService {
         String loanStructureStr = (String) product.get("loanStructure");
         String tenureType = (String) product.get("tenureType");
         Integer tenureValue = (Integer) product.get("tenureValue");
-        BigDecimal interestRate = (BigDecimal) product.get("interestRate");
+        BigDecimal interestRate = new BigDecimal(product.get("interestRate").toString());
 
         //check customer loan limit
         Map<String, Object> customer = customerClient.checkLoanLimit(request.getCustomerId(), request.getAmount());
@@ -73,7 +73,7 @@ public class LoanServiceImpl implements LoanService {
         BigDecimal serviceFee = fees != null ? feeCalculationService.calculateServiceFee(request.getAmount(), fees) : BigDecimal.ZERO;
 
         BigDecimal totalAmount = request.getAmount().add(serviceFee);
-        LoanStructure loanStructure= LoanStructure.valueOf(loanStructureStr);
+        LoanStructure loanStructure = "LUMPSUM".equals(loanStructureStr) ? LoanStructure.LUMP_SUM : LoanStructure.valueOf(loanStructureStr);
 
         LocalDate disbursementDate = LocalDate.now();
         LocalDate dueDate= calculateDueDate(disbursementDate, tenureValue, tenureType);
@@ -100,7 +100,7 @@ public class LoanServiceImpl implements LoanService {
         //generate installments for installment loans
         if(loanStructure == LoanStructure.INSTALLMENT){
             List<Installment> installments= installmentService.generateInstallments(loan, tenureValue);
-            loan.setInstallments(installments);
+            loan.setInstallments(new java.util.HashSet<>(installments));
             loan= loanRepository.save(loan);
         }
 
