@@ -79,7 +79,7 @@ public class NotificationServiceImpl implements NotificationService {
 
             // Route to channel-specific queue (e.g., "notificationemail" → notification.email.queue)
             String routingKey = "notification" + rule.getChannel().name().toLowerCase();
-            rabbitTemplate.convertAndSend("notification.exchange", routingKey, task);
+//            rabbitTemplate.convertAndSend("notification.exchange", routingKey, task);routingKey
 
             log.info("Published notification task: {} for customer: {}", task, customerId);
         }

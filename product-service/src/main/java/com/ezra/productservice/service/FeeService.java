@@ -3,9 +3,11 @@ package com.ezra.productservice.service;
 import com.ezra.productservice.dtos.FeeCreationRequest;
 import com.ezra.productservice.dtos.FeeDto;
 import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.UUID;
 
+@Validated
 public interface FeeService {
     FeeDto addFee(UUID productId, @Valid FeeCreationRequest request);
 

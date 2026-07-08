@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 /**
  * Publishes loan lifecycle events to the Kafka "loan.events" topic.
  * Events are keyed by customerId to ensure all events for a customer
@@ -22,6 +24,7 @@ public class LoanEventPublisher {
 
     public void publishLoanEvent(String eventType, Loan loan) {
         LoanEvent event = LoanEvent.builder()
+                .eventId(UUID.randomUUID().toString())
                 .eventType(eventType)
                 .loanId(loan.getId())
                 .customerId(loan.getCustomerId())

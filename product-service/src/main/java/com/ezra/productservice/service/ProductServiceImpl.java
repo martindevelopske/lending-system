@@ -48,6 +48,11 @@ public class ProductServiceImpl implements ProductService {
             throw new DuplicateProductException("Product with name '" + productCreationRequest.getName() + "'already exists");
         }
 
+        if (productCreationRequest.getMinimumAmount() != null && productCreationRequest.getMaximumAmount() != null
+                && productCreationRequest.getMinimumAmount().compareTo(productCreationRequest.getMaximumAmount()) > 0) {
+            throw new IllegalArgumentException("Minimum amount cannot be greater than maximum amount");
+        }
+
         Product product = productMapper.toNewProduct(productCreationRequest);
         product = productRepository.save(product);
 

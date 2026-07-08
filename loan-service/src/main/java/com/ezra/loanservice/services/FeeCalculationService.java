@@ -11,4 +11,6 @@ public interface FeeCalculationService {
     BigDecimal calculateServiceFee(@NotNull @DecimalMin(value = "0.01") BigDecimal amount, List<Map<String, Object>> fees);
 
     BigDecimal calculateDailyFee(BigDecimal principalAmount, List<Map<String, Object>> fees);
+
+    BigDecimal calculateLateFee(BigDecimal outstandingBalance, List<Map<String, Object>> fees, long daysOverdue);
 }

@@ -76,4 +76,42 @@ public class FeeCalculationServiceImpl implements FeeCalculationService {
 
         return totalDailyFee;
     }
+
+    /**
+     * Calculates the late fee to apply on overdue loans.
+     * Only processes fees with feeType=LATE whose daysAfterDue threshold has been met.
+     * Called by LateFeeApplicationJob for each overdue loan.
+     *
+     * @param outstandingBalance the current outstanding balance
+     * @param fees               list of fee configurations from the product-service
+     * @param daysOverdue        number of days the loan is past its due date
+     * @return total late fee amount to apply (ZERO if no applicable LATE fees)
+     */
+    @Override
+    public BigDecimal calculateLateFee(BigDecimal outstandingBalance, List<Map<String, Object>> fees, long daysOverdue) {
+        BigDecimal totalLateFee = BigDecimal.ZERO;
+
+        for (Map<String, Object> fee : fees) {
+            if ("LATE".equals(fee.get("feeType"))) {
+                int daysAfterDue = fee.get("daysAfterDue") != null
+                        ? ((Number) fee.get("daysAfterDue")).intValue()
+                        : 0;
+
+                if (daysOverdue >= daysAfterDue) {
+                    BigDecimal feeAmount = new BigDecimal(fee.get("amount").toString());
+                    String method = (String) fee.get("calculationMethod");
+
+                    if ("PERCENTAGE".equals(method)) {
+                        totalLateFee = totalLateFee.add(
+                                outstandingBalance.multiply(feeAmount).divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP));
+                    } else {
+                        totalLateFee = totalLateFee.add(feeAmount);
+                    }
+                }
+            }
+        }
+
+        log.debug("Calculated late fee: {} on outstanding: {} (days overdue: {})", totalLateFee, outstandingBalance, daysOverdue);
+        return totalLateFee;
+    }
 }

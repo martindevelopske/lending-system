@@ -1,10 +1,13 @@
 package com.ezra.notificationservice.event;
 
+import com.ezra.notificationservice.models.ProcessedEvent;
+import com.ezra.notificationservice.repository.ProcessedEventRepository;
 import com.ezra.notificationservice.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +17,10 @@ import java.util.UUID;
  * Kafka consumer that listens for loan lifecycle events (disbursed, repayment, overdue, etc.)
  * from the loan-service and triggers notification processing. Extracts event data into
  * template variables for rendering (loanId, amount, customer contact info, etc.).
+ *
+ * Implements idempotency via the processed_events table: each event's unique eventId
+ * is checked before processing. If the eventId already exists, the event is a duplicate
+ * (Kafka redelivery) and is skipped. This ensures customers never receive duplicate notifications.
  */
 @Component
 @RequiredArgsConstructor
@@ -21,10 +28,20 @@ import java.util.UUID;
 public class LoanEventConsumer {
 
     private final NotificationService notificationService;
+    private final ProcessedEventRepository processedEventRepository;
 
     @KafkaListener(topics = "loan.events", groupId = "notification-service-group")
+    @Transactional
     public void handleLoanEvent(Map<String, Object> eventData) {
         log.info("Received loan event: {}", eventData);
+
+        // Idempotency check: skip if this event was already processed
+        String eventId = eventData.get("eventId") != null ? eventData.get("eventId").toString() : null;
+        if (eventId != null && processedEventRepository.existsById(eventId)) {
+            log.info("Event {} already processed, skipping duplicate", eventId);
+            return;
+        }
+
         String eventType = (String) eventData.get("eventType");
         String customerId = (String) eventData.get("customerId");
         String loanId = (String) eventData.get("loanId");
@@ -48,15 +65,19 @@ public class LoanEventConsumer {
         if (eventData.get("customerLastName") != null)
             variables.put("lastName", eventData.get("customerLastName").toString());
 
-        try{
-            notificationService.processLoanEvent(
-                    eventType, customerId != null ? UUID.fromString(customerId) : null,
-                    loanId != null ? UUID.fromString(loanId) : null,
-                    productId != null ? UUID.fromString(productId) : null,
-                    variables
-            );
-        } catch (Exception e) {
-            log.error("Error processing loan event: {}", e.getMessage());
+        // No try-catch here — exceptions propagate to the DefaultErrorHandler
+        // which retries 3 times with 5s backoff, then publishes to loan.events.DLT
+        notificationService.processLoanEvent(
+                eventType, customerId != null ? UUID.fromString(customerId) : null,
+                loanId != null ? UUID.fromString(loanId) : null,
+                productId != null ? UUID.fromString(productId) : null,
+                variables
+        );
+
+        // Mark event as processed (same transaction as notification processing)
+        if (eventId != null) {
+            processedEventRepository.save(ProcessedEvent.builder().eventId(eventId).build());
+            log.debug("Marked event {} as processed", eventId);
         }
     }
 }

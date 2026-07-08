@@ -27,7 +27,7 @@ public class OverDueSweepJob {
 
     private final LoanRepository loanRepository;
     private final LoanStateMachine loanStateMachine;
-    private LoanEventPublisher loanEventPublisher;
+    private final LoanEventPublisher loanEventPublisher;
 
     @Scheduled(cron = "0 0 1 * * *") //1 am daily
     @Transactional

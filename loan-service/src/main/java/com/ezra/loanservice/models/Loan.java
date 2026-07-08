@@ -103,6 +103,13 @@ public class Loan {
     @Column(name = "last_fee_accrual_date")
     private LocalDate lastFeeAccrualDate;
 
+    @Column(name = "accrued_late_fees", nullable = false, precision = 19, scale = 4)
+    @Builder.Default
+    private BigDecimal accruedLateFees = BigDecimal.ZERO;
+
+    @Column(name = "last_late_fee_date")
+    private LocalDate lastLateFeeDate;
+
     @jakarta.persistence.PrePersist
     protected void onCreate() {
         if (createdAt == null) createdAt = LocalDateTime.now();

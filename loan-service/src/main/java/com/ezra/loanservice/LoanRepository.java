@@ -27,4 +27,7 @@ public interface LoanRepository extends JpaRepository<Loan, UUID> {
 
     @Query("SELECT l FROM Loan l WHERE l.state IN ('OPEN', 'OVERDUE') AND (l.lastFeeAccrualDate IS NULL OR l.lastFeeAccrualDate < :date)")
     List<Loan> findActiveLoansForDailyFeeAccrual(LocalDate date);
+
+    @Query("SELECT l FROM Loan l WHERE l.state = 'OVERDUE' AND l.dueDate < :date AND (l.lastLateFeeDate IS NULL OR l.lastLateFeeDate < :date)")
+    List<Loan> findOverdueLoansForLateFee(LocalDate date);
 }

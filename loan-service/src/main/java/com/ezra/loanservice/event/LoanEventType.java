@@ -8,4 +8,5 @@ public class LoanEventType {
     public static final String LOAN_CANCELLED = "LOAN_CANCELLED";
     public static final String LOAN_WRITTEN_OFF = "LOAN_WRITTEN_OFF";
     public static final String DAILY_FEE_ACCRUED = "DAILY_FEE_ACCRUED";
+    public static final String LATE_FEE_APPLIED = "LATE_FEE_APPLIED";
 }

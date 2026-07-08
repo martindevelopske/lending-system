@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
-@FeignClient(name = "customer-service")
+@FeignClient(name = "customer-service", fallbackFactory = CustomerClientFallbackFactory.class)
 public interface CustomerClient {
     @GetMapping("/api/v1/customers/{id}")
     Map<String, Object> getCustomer(@PathVariable("id") UUID customerId);

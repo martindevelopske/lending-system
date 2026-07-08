@@ -11,6 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class LoanEvent {
+    private String eventId;
     private String eventType;
     private UUID loanId;
     private UUID customerId;

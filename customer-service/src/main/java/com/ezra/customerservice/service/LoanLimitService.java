@@ -5,9 +5,11 @@ import com.ezra.customerservice.dto.LoanLimitCheckResponse;
 import com.ezra.customerservice.dto.LoanLimitRequest;
 import com.ezra.customerservice.dto.LoanLimitResponse;
 import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.UUID;
 
+@Validated
 public interface LoanLimitService {
     LoanLimitResponse setLoanLimit(UUID customerId, @Valid LoanLimitRequest request);
 

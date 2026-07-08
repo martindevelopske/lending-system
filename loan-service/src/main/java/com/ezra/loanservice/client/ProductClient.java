@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.Map;
 import java.util.UUID;
 
-@FeignClient(name = "product-service")
+@FeignClient(name = "product-service", fallbackFactory = ProductClientFallbackFactory.class)
 public interface ProductClient {
 
     @GetMapping("/api/v1/products/{id}")

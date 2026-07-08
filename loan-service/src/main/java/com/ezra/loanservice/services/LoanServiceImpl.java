@@ -62,6 +62,14 @@ public class LoanServiceImpl implements LoanService {
         Integer tenureValue = (Integer) product.get("tenureValue");
         BigDecimal interestRate = new BigDecimal(product.get("interestRate").toString());
 
+        //validate loan amount against product min/max
+        BigDecimal minAmount = product.get("minimumAmount") != null ? new BigDecimal(product.get("minimumAmount").toString()) : BigDecimal.ZERO;
+        BigDecimal maxAmount = product.get("maximumAmount") != null ? new BigDecimal(product.get("maximumAmount").toString()) : BigDecimal.ZERO;
+        if (request.getAmount().compareTo(minAmount) < 0 || request.getAmount().compareTo(maxAmount) > 0) {
+            throw new IllegalArgumentException(
+                    "Loan amount must be between " + minAmount + " and " + maxAmount + " for product " + productName);
+        }
+
         //check customer loan limit
         Map<String, Object> customer = customerClient.checkLoanLimit(request.getCustomerId(), request.getAmount());
         Boolean isEligible = (Boolean) customer.get("eligible");

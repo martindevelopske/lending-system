@@ -4,10 +4,12 @@ import com.ezra.customerservice.dto.CustomerCreateRequest;
 import com.ezra.customerservice.dto.CustomerResponse;
 import com.ezra.customerservice.dto.CustomerUpdateRequest;
 import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.UUID;
 
+@Validated
 public interface CustomerService {
     CustomerResponse getCustomer(UUID id);
 
